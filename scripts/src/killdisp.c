@@ -6,7 +6,7 @@
 // we want this compiled because we'll eventually use setuid for no
 // password prompt
 
-void main()
+int main()
 {
     setuid(0);
     printf("WARNING: must run as root, else you'll get a segfault\n");
@@ -54,5 +54,6 @@ void main()
     bbswitch = fopen("/proc/acpi/bbswitch", "w");
     fprintf(bbswitch, "OFF");
     fclose(bbswitch);
-
+	
+	return 0;
 }
