@@ -227,14 +227,10 @@ class ThinkDisp:
     #runs the commands to start the display using RESOLUTION and SIDE
     def start_disp(self, widget):
         subprocess.Popen(["optirun", "true"])
+		#YOU MUST HAVE intel-virtual-output in /usr/bin/
         time.sleep(1)
-        subprocess.Popen(["xrandr", "--output", "LVDS1", "--auto", "--output", 
-                         "VIRTUAL", "--mode", str(self.SETTINGS["RESOLUTION"]),
-                         "--rotate", str(self.SETTINGS["ROTATION"]), 
-                               "--"+str(self.SETTINGS["SIDE"])+"-of", "LVDS1"])
-		#YOU MUST HAVE screenclone in /usr/bin/
-        time.sleep(1)
-        subprocess.Popen(["screenclone", "-d", ":8", "-x", "1"])
+
+		subprocess.Popen(["intel-virtual-output"])
         self.status_check(0)
 
     def kill_disp(self, widget):
