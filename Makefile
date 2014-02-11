@@ -1,2 +1,2 @@
 all:
-	gcc scripts/src/killdisp.c -o scripts/killdisp
+	gcc scripts/src/killdisp.c -lX11 -lXrandr -o scripts/killdisp

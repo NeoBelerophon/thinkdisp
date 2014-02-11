@@ -2,17 +2,66 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <X11/extensions/Xrandr.h>
+#include <X11/Xlib.h>
+#include <string.h>
 // killdisp script for external monitors, part of thinkdisp
 // we want this compiled because we'll eventually use setuid for no
 // password prompt
+
+int startsWith(const char *pre, const char *str)
+{
+	return strncmp(pre, str, strlen(pre)) == 0;
+}
+
+
+void turnoffVirtualDisplays()
+{
+	int o;
+	Display *display;
+	int screen_num;
+	int display_width;
+	int display_height;
+	Window root;
+	XRRScreenResources  *res;
+	int screen;
+	char *display_name = NULL;
+	char buffer[200];
+
+	/* connect to X server */
+	if ( (display= XOpenDisplay(display_name)) == NULL )
+	{
+		(void) fprintf( stderr, "cannot connect to X server %s\n", XDisplayName(display_name));
+		exit( -1 );
+	}
+
+	screen = DefaultScreen (display);
+	root = RootWindow (display, screen);
+	res = XRRGetScreenResources(display, root);
+
+	for (o = 0; o < res->noutput; o++)
+	{
+		XRROutputInfo	*output_info = XRRGetOutputInfo (display, res, res->outputs[o]);
+		if(startsWith("VIRTUAL", output_info->name) && output_info->connection == 0 )
+		{
+			sprintf(buffer, "xrandr --output %s --off", output_info->name);
+			system(buffer);
+		}
+	}
+
+
+	XCloseDisplay(display);
+
+}
+
 
 int main()
 {
     setuid(0);
     printf("WARNING: must run as root, else you'll get a segfault\n");
     printf("turning off display\n");
-    system("xrandr --output VIRTUAL --off");
-    
+    turnoffVirtualDisplays();
+
     printf("killing screenclone\n");
     system("pkill screenclone");
     
